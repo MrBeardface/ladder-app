@@ -1,5 +1,8 @@
 class Activity < ActiveRecord::Base
 
+  default_scope { order(activity_date: :desc) }
+  scope :player_activity, ->(player_id) { where("challenger_id = ? OR challenged_player_id = ?", player_id, player_id) }
+
   def challenger_victorious?
     challenger_id == winner
   end
@@ -18,7 +21,7 @@ class Activity < ActiveRecord::Base
   end
 
   def challenge_canceled match
-    self.activity_date = Date.current
+    self.activity_date = Date.today
     self.activity_type = "Challenge Canceled"
     self.challenger_id = match.challenger_id
     self.challenger_first_name = match.challenger.first_name
